@@ -3,6 +3,7 @@
 import os
 import time
 import unittest
+from cryptography.fernet import Fernet
 from contextlib import closing
 
 import requests
@@ -10,7 +11,13 @@ import requests
 from census.core import (
     Census, UnsupportedYearException)
 
-KEY = os.environ.get('CENSUS_KEY', '')
+def get_census_key():
+    decrypt_key = os.environ['DECRYPT_KEY']
+    encrypted_census_api_key = os.environ['CENSUS_KEY']
+    cipher = Fernet(decrypt_key)
+    return cipher.decrypt(encrypted_census_api_key.encode("utf-8")).decode("utf-8")
+
+KEY = get_census_key()
 
 CLIENTS = (
     ('acs5', (
